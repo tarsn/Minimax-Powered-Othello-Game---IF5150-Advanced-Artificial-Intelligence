@@ -1,5 +1,5 @@
 class OthelloGame:
-    def __init__(self, player_mode="friend"):
+    def __init__(self, player_mode="friend", ai_mode=None):
         """
         A class representing the Othello game board and its rules.
 
@@ -13,6 +13,7 @@ class OthelloGame:
         self.board[4][4] = 1
         self.current_player = 1
         self.player_mode = player_mode
+        self.ai_mode = ai_mode
 
     def is_valid_move(self, row, col):
         """
