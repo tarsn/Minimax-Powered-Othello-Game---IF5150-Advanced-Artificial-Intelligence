@@ -1,4 +1,6 @@
 from othello_game import OthelloGame
+import math
+import random
 
 
 def get_best_move(game, max_depth=8):
@@ -176,3 +178,25 @@ def calculate_stability(game):
                 stable_count += 1
 
     return stable_count
+
+
+def local_search(game):
+    T = len(game.board[0])*len(game.board[0]) - sum(row.count(game.current_player) for row in game.board) - sum(row.count(-game.current_player) for row in game.board)
+
+    valid_moves = game.get_valid_moves()
+    best_move = valid_moves[0] if len(valid_moves) > 0 else None 
+    for move in valid_moves:
+        new_game = OthelloGame(player_mode=game.player_mode)
+        new_game.board = [row[:] for row in game.board]
+        new_game.current_player = game.current_player
+        new_game.make_move(*move)
+        
+        deltaE = evaluate_game_state(new_game) - evaluate_game_state(game)
+        if deltaE > 0:
+            best_move = move
+        else:
+            if math.exp(deltaE/T) > random.random():
+                best_move = move
+
+    return best_move
+
