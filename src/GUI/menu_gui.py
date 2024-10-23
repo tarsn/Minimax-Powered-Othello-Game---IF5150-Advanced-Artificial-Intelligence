@@ -29,11 +29,31 @@ class Menu:
         self.menu_items = ["Start Game", "Credit", "Exit"]
         self.submenu_items = [
             "Multi-player\n(Play with Friend)",
+            "Multi-player\n(AI vs AI)",
             "Single-player\n(Play with AI)",
             "Return to Main Menu",  # Add "Return to Main Menu" option
         ]
+        # Sub sub menu items for multi player AI vs AI Part 1
+        self.subsubmenu1_1_items = [
+            "Minimax_1 vs Minimax_2",
+            "Minimax_1 vs Minimax_3",
+            "Minimax_1 vs Local Search",
+            "Minimax_1 vs Genetic Algorithm",
+            "Minimax_2 vs Minimax_3",
+            "Next", # Add "Next" option
+        ]
+        # Sub sub menu items for multi player AI vs AI Part 2
+        self.subsubmenu1_2_items = [
+            "Minimax_2 vs Local Search",
+            "Minimax_2 vs Genetic Algorithm",
+            "Minimax_3 vs Local Search",
+            "Minimax_3 vs Genetic Algorithm",
+            "Local Search vs Genetic Algorithm",
+            "Return to Main Menu",  # Add "Return to Main Menu" option
+        ]
+
         # Sub sub menu items for single player 
-        self.subsubmenu_items = [
+        self.subsubmenu2_items = [
             "Minimax_1",
             "Minimax_2",
             "Minimax_3",
@@ -205,6 +225,9 @@ class Menu:
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
+                            
+                            elif button.text == "Multi-player\n(AI vs AI)":
+                                self.draw_subsubmenu1_1()
 
                             elif button.text == "Single-player\n(Play with AI)":
                                 '''othello_gui = OthelloGUI(player_mode="ai")
@@ -212,23 +235,23 @@ class Menu:
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )'''
-                                self.draw_subsubmenu()                                
+                                self.draw_subsubmenu2()                                
 
                             elif button.text == "Return to Main Menu":
                                 self.draw_menu()  # Go back to the main menu
 
-    def draw_subsubmenu(self):
+    def draw_subsubmenu1_1(self):
         """
         Draw the subsubmenu on the Pygame window.
         """
         self.win.blit(self.background_image, (0, 0)) 
 
         buttons = []
-        num_subsubmenu_items = len(self.subsubmenu_items)
+        num_subsubmenu_items = len(self.subsubmenu1_1_items)
         subsubmenu_height = num_subsubmenu_items * SUBMENU_SPACING
         subsubmenu_top_margin = (HEIGHT - subsubmenu_height) // 2
 
-        for i, item in enumerate(self.subsubmenu_items):
+        for i, item in enumerate(self.subsubmenu1_1_items):
             button_y = subsubmenu_top_margin + i * SUBMENU_SPACING
             button = Button(
                 WIDTH // 2, button_y, 200, 30, item, self.menu_font
@@ -237,9 +260,145 @@ class Menu:
             button.draw(self.win)
         
         pygame.display.update()
-        self.handle_input_subsubmenu(buttons)
+        self.handle_input_subsubmenu1_1(buttons)
+    
+    def handle_input_subsubmenu1_1(self, buttons):
+        """
+        Handle input events for the subsubmenu.
 
-    def handle_input_subsubmenu(self, buttons):
+        Parameters:
+            buttons (list): The list of buttons in the subsubmenu.
+        """
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = event.pos
+                    for button in buttons:
+                        if button.check_collision((x, y)):
+
+                            if button.text == "Minimax_1 vs Minimax_2":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_minimax_2")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Minimax_1 vs Minimax_3":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_minimax_3")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Minimax_1 vs Local Search":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_local_search")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Minimax_1 vs Genetic Algorithm":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_genetic_algorithm")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Minimax_2 vs Minimax_3":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2_vs_minimax_3")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Next":
+                                self.draw_subsubmenu1_2()
+
+    def draw_subsubmenu1_2(self):
+        """
+        Draw the subsubmenu on the Pygame window.
+        """
+        self.win.blit(self.background_image, (0, 0)) 
+
+        buttons = []
+        num_subsubmenu_items = len(self.subsubmenu1_2_items)
+        subsubmenu_height = num_subsubmenu_items * SUBMENU_SPACING
+        subsubmenu_top_margin = (HEIGHT - subsubmenu_height) // 2
+
+        for i, item in enumerate(self.subsubmenu1_2_items):
+            button_y = subsubmenu_top_margin + i * SUBMENU_SPACING
+            button = Button(
+                WIDTH // 2, button_y, 200, 30, item, self.menu_font
+            )  
+            buttons.append(button)
+            button.draw(self.win)
+        
+        pygame.display.update()
+        self.handle_input_subsubmenu1_2(buttons)
+
+    def handle_input_subsubmenu1_2(self, buttons):
+        """
+        Handle input events for the subsubmenu.
+
+        Parameters:
+            buttons (list): The list of buttons in the subsubmenu.
+        """
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = event.pos
+                    for button in buttons:
+                        if button.check_collision((x, y)):
+
+                            if button.text == "Minimax_2 vs Local Search":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2_vs_local_search")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Minimax_2 vs Genetic Algorithm":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2_vs_genetic_algorithm")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Minimax_3 vs Local Search":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_3_vs_local_search")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Minimax_3 vs Genetic Algorithm":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_3_vs_genetic_algorithm")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Local Search vs Genetic Algorithm":
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="local_search_vs_genetic_algorithm")
+                                othello_gui.run_game(
+                                    return_to_menu_callback=self.draw_menu
+                                )
+                            elif button.text == "Return to Main Menu":
+                                self.draw_menu()
+
+    def draw_subsubmenu2(self):
+        """
+        Draw the subsubmenu on the Pygame window.
+        """
+        self.win.blit(self.background_image, (0, 0)) 
+
+        buttons = []
+        num_subsubmenu_items = len(self.subsubmenu2_items)
+        subsubmenu_height = num_subsubmenu_items * SUBMENU_SPACING
+        subsubmenu_top_margin = (HEIGHT - subsubmenu_height) // 2
+
+        for i, item in enumerate(self.subsubmenu2_items):
+            button_y = subsubmenu_top_margin + i * SUBMENU_SPACING
+            button = Button(
+                WIDTH // 2, button_y, 200, 30, item, self.menu_font
+            )  
+            buttons.append(button)
+            button.draw(self.win)
+        
+        pygame.display.update()
+        self.handle_input_subsubmenu2(buttons)
+
+    def handle_input_subsubmenu2(self, buttons):
         """
         Handle input events for the subsubmenu.
 
