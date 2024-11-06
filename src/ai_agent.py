@@ -228,10 +228,10 @@ def local_search(game):
 
         T = 100
         best_current_value = -9999
-        for i in range(1000):
+        for i in range(200):
             old_valid_moves = old_game.get_valid_moves()
             if len(old_valid_moves) == 0:
-                continue
+                break
             index = math.floor(random.random()*len(old_valid_moves))
 
             new_game = OthelloGame(player_mode=old_game.player_mode)
@@ -300,9 +300,7 @@ def genetic(game):
         new_valid_moves = new_game.get_valid_moves()
         random.shuffle(new_valid_moves)
 
-        print(padded_binary_string)
-
-        if(len(new_valid_moves) > 2):
+        if(len(new_valid_moves) >= 2):
             for j in range(2):
                 new_child_game = OthelloGame(player_mode=new_game.player_mode)
                 new_child_game.board = [row[:] for row in new_game.board]
@@ -317,10 +315,18 @@ def genetic(game):
         else:
             binary_strings.append(f"{padded_binary_string}0")
             binary_strings.append(f"{padded_binary_string}1")
-            values.append(new_value/2)
+            if len(new_valid_moves) == 1:
+                new_child_game = OthelloGame(player_mode=new_game.player_mode)
+                new_child_game.board = [row[:] for row in new_game.board]
+                new_child_game.current_player = new_game.current_player
+                new_child_game.ai_mode = new_game.ai_mode
+                new_child_game.make_move(*new_valid_moves[j])
+                new_child_game.current_player = -1*new_child_game.current_player
+                values.append((new_value + evaluate_game_state(new_child_game))/2)
+            else:
+                values.append(new_value/2)
             values.append(new_value/2)
 
-    print(binary_strings)
     if len(binary_string) <= 2:
         return valid_moves[0]
 
@@ -355,12 +361,8 @@ def genetic(game):
         return valid_moves[0]
 
     if values[index1] > values[index2]:
-        print(individu1)
-        print(f"nilai {individu2[:length_genetic]} {int(individu1[:length_genetic], 2)}")
         best_move = valid_moves[int(individu1[:length_genetic], 2)]
     else:
-        print(individu2)
-        print(f"nilai {individu2[:length_genetic]} {int(individu2[:length_genetic], 2)}")
         best_move = valid_moves[int(individu2[:length_genetic], 2)]
 
     return best_move
