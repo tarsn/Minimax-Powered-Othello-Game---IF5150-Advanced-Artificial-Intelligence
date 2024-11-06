@@ -320,7 +320,7 @@ def genetic(game):
                 new_child_game.board = [row[:] for row in new_game.board]
                 new_child_game.current_player = new_game.current_player
                 new_child_game.ai_mode = new_game.ai_mode
-                new_child_game.make_move(*new_valid_moves[j])
+                new_child_game.make_move(*new_valid_moves[0])
                 new_child_game.current_player = -1*new_child_game.current_player
                 values.append((new_value + evaluate_game_state(new_child_game))/2)
             else:
