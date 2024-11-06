@@ -118,7 +118,14 @@ def alphabeta(
         return min_eval, best_move
 
 
-def evaluate_game_state(game):
+def evaluate_game_state(game, type=1):
+    if type == 1:
+        return evaluate_game_state_v1(game)
+    else:
+        return evaluate_game_state_v2(game)
+
+
+def evaluate_game_state_v1(game):
     """
     Evaluates the current game state for the AI player.
 

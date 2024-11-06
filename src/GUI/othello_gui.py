@@ -3,6 +3,8 @@ import sys
 from othello_game import OthelloGame
 from ai_agent import get_best_move
 import time
+import csv
+import os
 
 # Constants and colors
 WIDTH, HEIGHT = 480, 560
@@ -137,56 +139,70 @@ class OthelloGUI:
         """
         Run the main game loop until the game is over and display the result.
         """
-        while not self.game.is_game_over():
-            if self.game.current_player == 1 :
-                player_turn = "Black"
-            else:
-                player_turn = "White"
-            if self.game.player_mode == "player" or (self.game.player_mode == "ai" and self.game.current_player == 1 and len(self.game.ai_mode) <= 17):
-                self.handle_input()
-            elif self.game.player_mode == "ai" and len(self.game.ai_mode) <= 17 and self.game.current_player == -1:
-                start_time = time.time()
 
-                self.message = "AI is thinking..."
-                self.draw_board()  # Display the thinking message
-                ai_move = get_best_move(self.game)
-                pygame.time.delay(500)  # Wait for a short time to show the message
-                self.game.make_move(*ai_move)
+        csv_filename = "src/Analyst/minimax3_vs_local.csv"
+        # file_exists = os.path.isfile(csv_filename)
+        with open(csv_filename, mode="a", newline="") as file:
+            writer = csv.writer(file)
+        
+            # Jika file belum ada, tambahkan header
+            # if not file_exists:
+            #     writer.writerow(["agent", "waktu"])
 
-                end_time = time.time()
-                print(f"{player_turn} : AI move took {end_time - start_time:.4f} seconds.")
+            while not self.game.is_game_over():
+                if self.game.current_player == 1 :
+                    player_turn = "Black"
+                else:
+                    player_turn = "White"
+                if self.game.player_mode == "player" or (self.game.player_mode == "ai" and self.game.current_player == 1 and len(self.game.ai_mode) <= 17):
+                    self.handle_input()
+                elif self.game.player_mode == "ai" and len(self.game.ai_mode) <= 17 and self.game.current_player == -1:
+                    start_time = time.time()
 
-            elif self.game.player_mode == "ai" and len(self.game.ai_mode) > 17:
-                start_time = time.time()
-                
-                self.message = "AI is thinking..."
+                    self.message = "AI is thinking..."
+                    self.draw_board()  # Display the thinking message
+                    ai_move = get_best_move(self.game)
+                    pygame.time.delay(500)  # Wait for a short time to show the message
+                    self.game.make_move(*ai_move)
+
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    print(f"{player_turn} : AI move took {elapsed_time:.4f} seconds.")
+                    # writer.writerow([player_turn, f"{elapsed_time:.4f}"])
+
+                elif self.game.player_mode == "ai" and len(self.game.ai_mode) > 17:
+                    start_time = time.time()
+                    
+                    self.message = "AI is thinking..."
+                    self.draw_board()
+                    ai_move = get_best_move(self.game)
+                    pygame.time.delay(500)
+                    self.game.make_move(*ai_move)
+
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    print(f"{player_turn} : AI move took {elapsed_time:.4f} seconds.")
+                    # writer.writerow([player_turn, f"{elapsed_time:.4f}"])
+
+                self.message = ""  # Clear any previous messages
                 self.draw_board()
-                ai_move = get_best_move(self.game)
-                pygame.time.delay(500)
-                self.game.make_move(*ai_move)
 
-                end_time = time.time()
-                print(f"{player_turn} : AI move took {end_time - start_time:.4f} seconds.")
+            winner = self.game.get_winner()
+            if winner == 1:
+                self.message = "Black wins!"
+            elif winner == -1:
+                self.message = "White wins!"
+            else:
+                self.message = "It's a tie!"
+            print()
 
-            self.message = ""  # Clear any previous messages
             self.draw_board()
+            self.end_game_sound.play()  # Play end game sound effect
+            pygame.time.delay(10000)  # Display the result for 2 seconds before returning
 
-        winner = self.game.get_winner()
-        if winner == 1:
-            self.message = "Black wins!"
-        elif winner == -1:
-            self.message = "White wins!"
-        else:
-            self.message = "It's a tie!"
-        print()
-
-        self.draw_board()
-        self.end_game_sound.play()  # Play end game sound effect
-        pygame.time.delay(10000)  # Display the result for 2 seconds before returning
-
-        # Call the return_to_menu_callback if provided
-        if return_to_menu_callback:
-            return_to_menu_callback()
+            # Call the return_to_menu_callback if provided
+            if return_to_menu_callback:
+                return_to_menu_callback()
 
 
 def run_game():
