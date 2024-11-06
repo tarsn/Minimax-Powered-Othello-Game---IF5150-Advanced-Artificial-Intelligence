@@ -181,22 +181,151 @@ def calculate_stability(game):
 
 
 def local_search(game):
-    T = len(game.board[0])*len(game.board[0]) - sum(row.count(game.current_player) for row in game.board) - sum(row.count(-game.current_player) for row in game.board)
+    T = 100
 
     valid_moves = game.get_valid_moves()
-    best_move = valid_moves[0] if len(valid_moves) > 0 else None 
+    best_move = None
+    best_value = -9999999
+    
     for move in valid_moves:
+
+        old_game = OthelloGame(player_mode=game.player_mode)
+        old_game.board = [row[:] for row in game.board]
+        old_game.current_player = game.current_player
+        old_game.ai_mode = game.ai_mode
+
+        best_current_move = None
+        best_current_value = -9999
+        for i in range(1000):
+            old_valid_moves = old_game.get_valid_moves()
+            index = math.floor(random.random()*len(old_valid_moves))
+
+            new_game = OthelloGame(player_mode=old_game.player_mode)
+            new_game.board = [row[:] for row in old_game.board]
+            new_game.current_player = old_game.current_player
+            new_game.ai_mode = old_game.ai_mode
+            new_game.make_move(*old_valid_moves[index])
+
+            new_value = None
+            old_value = None
+            if old_game.current_player == game.current_player:
+                new_value = evaluate_game_state(new_game)
+                old_game.current_player = -1*old_game.current_player
+                old_value = evaluate_game_state(old_game)
+                old_game.current_player = -1*old_game.current_player
+            else:
+                new_game.current_player = -1*new_game.current_player
+                new_value = evaluate_game_state(new_game)
+                new_game.current_player = -1*new_game.current_player
+                old_value = evaluate_game_state(old_game)
+            deltaE = new_value - old_value
+            if deltaE > 0:
+                best_current_value = new_value
+                old_game = OthelloGame(player_mode=new_game.player_mode)
+                old_game.board = [row[:] for row in new_game.board]
+                old_game.current_player = new_game.current_player
+                old_game.ai_mode = new_game.ai_mode
+            else:
+                if T == 0:
+                    break
+                elif math.exp(deltaE/T) > random.random():
+                    old_game = OthelloGame(player_mode=new_game.player_mode)
+                    old_game.board = [row[:] for row in new_game.board]
+                    old_game.current_player = new_game.current_player
+                    old_game.ai_mode = new_game.ai_mode
+            
+            T *= 0.98
+
+        if best_current_value > best_value:
+            best_value = best_current_value
+            best_move = best_current_move
+        
+    return best_move
+
+def genetic(game):
+    best_move = None
+    valid_moves = game.get_valid_moves()
+    if len(valid_moves) == 0:
+        return best_move
+    random.shuffle(valid_moves)
+    length_genetic = int(math.floor(math.log2(len(valid_moves))))
+
+    binary_strings = []
+    values = []
+    for i in range(0, int(math.pow(2, length_genetic))):
+        binary_string = bin(i)[2:]  
+        padded_binary_string = binary_string.zfill(length_genetic) 
+
         new_game = OthelloGame(player_mode=game.player_mode)
         new_game.board = [row[:] for row in game.board]
         new_game.current_player = game.current_player
-        new_game.make_move(*move)
-        
-        deltaE = evaluate_game_state(new_game) - evaluate_game_state(game)
-        if deltaE > 0:
-            best_move = move
+        new_game.ai_mode = game.ai_mode
+        new_game.make_move(*valid_moves[i])
+
+        new_value = evaluate_game_state(new_game)
+        new_valid_moves = new_game.get_valid_moves()
+        random.shuffle(new_valid_moves)
+
+        if(len(new_valid_moves) > 2):
+            for j in range(2):
+                new_child_game = OthelloGame(player_mode=new_game.player_mode)
+                new_child_game.board = [row[:] for row in new_game.board]
+                new_child_game.current_player = new_game.current_player
+                new_child_game.ai_mode = new_game.ai_mode
+                new_child_game.make_move(*new_valid_moves[j])
+
+                new_child_game.current_player = -1*new_child_game.current_player
+                binary_strings.append(f"{padded_binary_string}{bin(j-1)[2:]}")
+                values.append((new_value+evaluate_game_state(new_child_game))/2)
+                new_child_game.current_player = -1*new_child_game.current_player
         else:
-            if math.exp(deltaE/T) > random.random():
-                best_move = move
+            binary_strings.append(f"{padded_binary_string}0")
+            binary_strings.append(f"{padded_binary_string}1")
+            values.append(new_value/2)
+            values.append(new_value/2)
+
+
+    if len(binary_string) == 0:
+        return valid_moves[0]
+
+    sorted_lists = sorted(zip(values, binary_strings), key=lambda x: x[0], reverse=True)
+    list1_sorted, list2_sorted = zip(*sorted_lists)
+
+    values = list(list1_sorted)
+    binary_strings = list(list2_sorted)
+
+    total = sum(values)
+    percentages = [(num / total) for num in values]
+
+    indices = []
+    for i in range(4):
+        rand = random.random()
+        j = 0
+        tmpPrecentage = percentages[0]
+        while tmpPrecentage < rand:
+            tmpPrecentage += percentages[j]
+            j += 1
+        indices.append(j)
+
+    individu1 = f"{binary_strings[indices[0]][:length_genetic//2]}{binary_strings[indices[1]][length_genetic//2:]}"
+    individu1 = individu1[:length_genetic//2] + str(random.randint(0,1)) + individu1[length_genetic//2+1:]
+    individu2 = f"{binary_strings[indices[0]][:length_genetic//2]}{binary_strings[indices[1]][length_genetic//2:]}"
+    individu2 = individu2[:length_genetic//2] + str(random.randint(0,1)) + individu2[length_genetic//2+1:]
+        
+    try:
+        index1 = binary_strings.index(individu1)
+        index2 = binary_strings.index(individu2)
+    except:
+        return valid_moves[0]
+
+    if values[index1] > values[index2]:
+        best_move = valid_moves[int(individu1[:length_genetic+1], 2)]
+    else:
+        best_move = valid_moves[int(individu2[:length_genetic+1], 2)]
 
     return best_move
 
+    
+
+
+    
