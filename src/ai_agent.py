@@ -323,7 +323,7 @@ def genetic(game):
             values.append(new_value/2)
 
     print(binary_strings)
-    if len(binary_string) == 0:
+    if len(binary_string) <= 2:
         return valid_moves[0]
 
     sorted_lists = sorted(zip(values, binary_strings), key=lambda x: x[0], reverse=True)
