@@ -215,8 +215,6 @@ def calculate_stability(game):
 
 
 def local_search(game):
-    T = 100
-
     valid_moves = game.get_valid_moves()
     best_move = None
     best_value = -9999999
@@ -228,7 +226,7 @@ def local_search(game):
         old_game.current_player = game.current_player
         old_game.ai_mode = game.ai_mode
 
-        best_current_move = None
+        T = 100
         best_current_value = -9999
         for i in range(1000):
             old_valid_moves = old_game.get_valid_moves()
