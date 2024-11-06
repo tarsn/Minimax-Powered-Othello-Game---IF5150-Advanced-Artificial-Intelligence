@@ -137,14 +137,20 @@ class OthelloGUI:
         Run the main game loop until the game is over and display the result.
         """
         while not self.game.is_game_over():
-            self.handle_input()
-
-            # If it's the AI player's turn
-            if self.game.player_mode == "ai" and self.game.current_player == -1:
+            
+            if self.game.player_mode == "player" or (self.game.player_mode == "ai" and self.game.current_player == 1):
+                self.handle_input()
+            elif self.game.player_mode == "ai" and len(self.game.ai_mode) <= 17 and self.game.current_player == -1:
                 self.message = "AI is thinking..."
                 self.draw_board()  # Display the thinking message
                 ai_move = get_best_move(self.game)
                 pygame.time.delay(500)  # Wait for a short time to show the message
+                self.game.make_move(*ai_move)
+            elif self.game.player_mode == "ai" and len(self.game.ai_mode) > 17:
+                self.message = "AI is thinking..."
+                self.draw_board()
+                ai_move = get_best_move(self.game)
+                pygame.time.delay(500)
                 self.game.make_move(*ai_move)
 
             self.message = ""  # Clear any previous messages
