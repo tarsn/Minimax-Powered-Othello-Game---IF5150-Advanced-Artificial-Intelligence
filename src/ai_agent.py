@@ -19,9 +19,9 @@ def get_best_move(game, max_depth=8):
         if game.ai_mode == "minimax_1":
             _, best_move = alphabeta(game, 2)
         elif game.ai_mode == "minimax_2":
-            _, best_move = alphabeta(game, 4)
+            _, best_move = alphabeta(game, 3)
         elif game.ai_mode == "minimax_3":
-            _, best_move = alphabeta(game, 6)
+            _, best_move = alphabeta(game, 4)
         elif game.ai_mode == "local_search":
             best_move = local_search(game)
         else: 
@@ -32,9 +32,9 @@ def get_best_move(game, max_depth=8):
             if algos[0] == "minimax_1":
                 _, best_move = alphabeta(game, 2)
             elif algos[0] == "minimax_2":
-                _, best_move = alphabeta(game, 4)
+                _, best_move = alphabeta(game, 3)
             elif algos[0] == "minimax_3":
-                _, best_move = alphabeta(game, 6)
+                _, best_move = alphabeta(game, 4)
             elif algos[0] == "local_search":
                 best_move = local_search(game)
             else: 
@@ -43,9 +43,9 @@ def get_best_move(game, max_depth=8):
             if algos[1] == "minimax_1":
                 _, best_move = alphabeta(game, 2)
             elif algos[1] == "minimax_2":
-                _, best_move = alphabeta(game, 4)
+                _, best_move = alphabeta(game, 3)
             elif algos[1] == "minimax_3":
-                _, best_move = alphabeta(game, 6)
+                _, best_move = alphabeta(game, 4)
             elif algos[1] == "local_search":
                 best_move = local_search(game)
             else: 
@@ -167,6 +167,88 @@ def evaluate_game_state(game):
         + corner_occupancy * corner_occupancy_weight
         + stability * stability_weight
         + edge_occupancy * edge_occupancy_weight
+    )
+
+    return evaluation
+
+
+def evaluate_game_state_v2(game):
+    # Tentukan tahapan permainan berdasarkan persentase bidak yang sudah ditempatkan di papan
+    total_disks = sum(row.count(1) + row.count(-1) for row in game.board)
+    board_size = len(game.board) * len(game.board[0])
+    game_stage_ratio = total_disks / board_size
+
+    # Tentukan bobot untuk setiap faktor berdasarkan tahapan permainan
+    if game_stage_ratio < 0.2:  # Early game
+        coin_parity_weight = 0.5
+        mobility_weight = 3.0
+        corner_occupancy_weight = 5.0
+        stability_weight = 2.0
+        edge_occupancy_weight = 2.0
+        aggressiveness_weight = 1.0
+    elif game_stage_ratio < 0.8:  # Mid game
+        coin_parity_weight = 1.0
+        mobility_weight = 2.5
+        corner_occupancy_weight = 4.0
+        stability_weight = 3.0
+        edge_occupancy_weight = 2.5
+        aggressiveness_weight = 1.5
+    else:  # Late game
+        coin_parity_weight = 2.0
+        mobility_weight = 1.0
+        corner_occupancy_weight = 6.0
+        stability_weight = 4.0
+        edge_occupancy_weight = 3.0
+        aggressiveness_weight = 0.5
+
+    # Coin parity
+    player_disk_count = sum(row.count(game.current_player) for row in game.board)
+    opponent_disk_count = sum(row.count(-game.current_player) for row in game.board)
+    coin_parity = player_disk_count - opponent_disk_count
+
+    # Mobility
+    player_valid_moves = len(game.get_valid_moves())
+    opponent_valid_moves = len(
+        OthelloGame(player_mode=-game.current_player).get_valid_moves()
+    )
+    mobility = player_valid_moves - opponent_valid_moves
+
+    # Corner occupancy
+    corner_occupancy = sum(
+        game.board[i][j] for i, j in [(0, 0), (0, 7), (7, 0), (7, 7)]
+    )
+
+    # Stability
+    stability = calculate_stability(game)
+
+    # Edge occupancy
+    edge_occupancy = sum(game.board[i][j] for i in [0, 7] for j in range(1, 7)) + sum(
+        game.board[i][j] for i in range(1, 7) for j in [0, 7]
+    )
+
+    # Aggressiveness: jumlah disk yang dekat dengan lawan
+    aggressiveness = 0
+    for i in range(8):
+        for j in range(8):
+            if game.board[i][j] == game.current_player:
+                # Hitung bidak lawan di sekitar bidak pemain saat ini
+                adjacent_opponent_count = sum(
+                    1 for x, y in [
+                        (i-1, j), (i+1, j), (i, j-1), (i, j+1),
+                        (i-1, j-1), (i-1, j+1), (i+1, j-1), (i+1, j+1)
+                    ]
+                    if 0 <= x < 8 and 0 <= y < 8 and game.board[x][y] == -game.current_player
+                )
+                aggressiveness += adjacent_opponent_count
+
+    # Hitung evaluasi akhir dengan bobot yang telah disesuaikan
+    evaluation = (
+        coin_parity * coin_parity_weight
+        + mobility * mobility_weight
+        + corner_occupancy * corner_occupancy_weight
+        + stability * stability_weight
+        + edge_occupancy * edge_occupancy_weight
+        - aggressiveness * aggressiveness_weight
     )
 
     return evaluation
@@ -366,8 +448,3 @@ def genetic(game):
         best_move = valid_moves[int(individu2[:length_genetic], 2)]
 
     return best_move
-
-    
-
-
-    
