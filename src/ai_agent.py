@@ -357,9 +357,11 @@ def genetic(game):
         return valid_moves[0]
 
     if values[index1] > values[index2]:
+        print(individu1)
         print(f"nilai {individu2[:length_genetic]} {int(individu1[:length_genetic], 2)}")
         best_move = valid_moves[int(individu1[:length_genetic], 2)]
     else:
+        print(individu2)
         print(f"nilai {individu2[:length_genetic]} {int(individu2[:length_genetic], 2)}")
         best_move = valid_moves[int(individu2[:length_genetic], 2)]
 
