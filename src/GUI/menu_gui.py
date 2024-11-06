@@ -29,7 +29,7 @@ class Menu:
         self.menu_items = ["Start Game", "Credit", "Exit"]
         self.submenu_items = [
             "Multi-player\n(Play with Friend)",
-            "Multi-player\n(AI vs AI)",
+            "Non-player\n(AI vs AI)",
             "Single-player\n(Play with AI)",
             "Return to Main Menu",  # Add "Return to Main Menu" option
         ]
@@ -226,7 +226,7 @@ class Menu:
                                     return_to_menu_callback=self.draw_menu
                                 )
                             
-                            elif button.text == "Multi-player\n(AI vs AI)":
+                            elif button.text == "Non-player\n(AI vs AI)":
                                 self.draw_subsubmenu1_1()
 
                             elif button.text == "Single-player\n(Play with AI)":

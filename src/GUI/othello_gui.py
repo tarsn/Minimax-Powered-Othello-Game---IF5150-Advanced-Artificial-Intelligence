@@ -2,6 +2,7 @@ import pygame
 import sys
 from othello_game import OthelloGame
 from ai_agent import get_best_move
+import time
 
 # Constants and colors
 WIDTH, HEIGHT = 480, 560
@@ -137,22 +138,35 @@ class OthelloGUI:
         Run the main game loop until the game is over and display the result.
         """
         while not self.game.is_game_over():
+            if self.game.current_player == 1 :
+                player_turn = "Black"
+            else:
+                player_turn = "White"
             if self.game.player_mode == "player" or (self.game.player_mode == "ai" and self.game.current_player == 1 and len(self.game.ai_mode) <= 17):
-                print("masuk 1")
                 self.handle_input()
             elif self.game.player_mode == "ai" and len(self.game.ai_mode) <= 17 and self.game.current_player == -1:
+                start_time = time.time()
+
                 self.message = "AI is thinking..."
                 self.draw_board()  # Display the thinking message
                 ai_move = get_best_move(self.game)
                 pygame.time.delay(500)  # Wait for a short time to show the message
                 self.game.make_move(*ai_move)
+
+                end_time = time.time()
+                print(f"{player_turn} : AI move took {end_time - start_time:.4f} seconds.")
+
             elif self.game.player_mode == "ai" and len(self.game.ai_mode) > 17:
-                print("masuk 3")
+                start_time = time.time()
+                
                 self.message = "AI is thinking..."
                 self.draw_board()
                 ai_move = get_best_move(self.game)
                 pygame.time.delay(500)
                 self.game.make_move(*ai_move)
+
+                end_time = time.time()
+                print(f"{player_turn} : AI move took {end_time - start_time:.4f} seconds.")
 
             self.message = ""  # Clear any previous messages
             self.draw_board()
@@ -164,6 +178,7 @@ class OthelloGUI:
             self.message = "White wins!"
         else:
             self.message = "It's a tie!"
+        print()
 
         self.draw_board()
         self.end_game_sound.play()  # Play end game sound effect
