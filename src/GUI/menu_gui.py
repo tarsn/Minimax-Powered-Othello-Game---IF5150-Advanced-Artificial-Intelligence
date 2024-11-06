@@ -27,6 +27,7 @@ class Menu:
         self.win = self.initialize_pygame()
         self.menu_font = pygame.font.SysFont(None, 36)
         self.menu_items = ["Start Game", "Credit", "Exit"]
+        self.tmp_fungsi_eval = "1"
         self.submenu_items = [
             "Multi-player\n(Play with Friend)",
             "Non-player\n(AI vs AI)",
@@ -34,6 +35,10 @@ class Menu:
             "Return to Main Menu",  # Add "Return to Main Menu" option
         ]
         # Sub sub menu items for multi player AI vs AI Part 1
+        self.submenu_0_5_items = [
+            "Fungsi Evaluasi 1",
+            "Fungsi Evaluasi 2"
+        ]
         self.subsubmenu1_1_items = [
             "Minimax_1 vs Minimax_2",
             "Minimax_1 vs Minimax_3",
@@ -227,7 +232,7 @@ class Menu:
                                 )
                             
                             elif button.text == "Non-player\n(AI vs AI)":
-                                self.draw_subsubmenu1_1()
+                                self.draw_submenu_0_5("1")
 
                             elif button.text == "Single-player\n(Play with AI)":
                                 '''othello_gui = OthelloGUI(player_mode="ai")
@@ -235,10 +240,57 @@ class Menu:
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )'''
-                                self.draw_subsubmenu2()                                
+                                self.draw_submenu_0_5("2")                                
 
                             elif button.text == "Return to Main Menu":
                                 self.draw_menu()  # Go back to the main menu
+
+    def draw_submenu_0_5(self, nextmenu):
+        self.win.blit(self.background_image, (0, 0)) 
+
+        buttons = []
+        num_subsubmenu_items = len(self.submenu_0_5_items)
+        subsubmenu_height = num_subsubmenu_items * SUBMENU_SPACING
+        subsubmenu_top_margin = (HEIGHT - subsubmenu_height) // 2
+
+        for i, item in enumerate(self.submenu_0_5_items):
+            button_y = subsubmenu_top_margin + i * SUBMENU_SPACING
+            button = Button(
+                WIDTH // 2, button_y, 200, 30, item, self.menu_font
+            )  
+            buttons.append(button)
+            button.draw(self.win)
+        
+        pygame.display.update()
+        self.handle_input_subsubmenu1_0_5(buttons, nextmenu)
+
+    def handle_input_subsubmenu1_0_5(self, buttons, nextmenu):
+        """
+        Handle input events for the subsubmenu.
+
+        Parameters:
+            buttons (list): The list of buttons in the subsubmenu.
+        """
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = event.pos
+                    for button in buttons:
+                        if button.check_collision((x, y)):
+
+                            if button.text == "Fungsi Evaluasi 1":
+                                self.tmp_fungsi_eval = "1"
+                            else:
+                                self.tmp_fungsi_eval = "2"
+
+                            if nextmenu == "2":
+                                self.draw_subsubmenu2()
+                            else:
+                                self.draw_subsubmenu1_1()
 
     def draw_subsubmenu1_1(self):
         """
@@ -281,27 +333,27 @@ class Menu:
                         if button.check_collision((x, y)):
 
                             if button.text == "Minimax_1 vs Minimax_2":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_minimax_2")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_minimax_2", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Minimax_1 vs Minimax_3":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_minimax_3")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_minimax_3", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Minimax_1 vs Local Search":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_local_search")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_local_search", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Minimax_1 vs Genetic Algorithm":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_genetic_algorithm")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1_vs_genetic_algorithm", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Minimax_2 vs Minimax_3":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2_vs_minimax_3")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2_vs_minimax_3", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
@@ -349,27 +401,27 @@ class Menu:
                         if button.check_collision((x, y)):
 
                             if button.text == "Minimax_2 vs Local Search":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2_vs_local_search")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2_vs_local_search", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Minimax_2 vs Genetic Algorithm":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2_vs_genetic_algorithm")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2_vs_genetic_algorithm", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Minimax_3 vs Local Search":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_3_vs_local_search")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_3_vs_local_search", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Minimax_3 vs Genetic Algorithm":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_3_vs_genetic_algorithm")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_3_vs_genetic_algorithm", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Local Search vs Genetic Algorithm":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="local_search_vs_genetic_algorithm")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="local_search_vs_genetic_algorithm", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
@@ -418,27 +470,27 @@ class Menu:
 
                             if button.text == "Minimax_1":
                                 #Example: othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1")
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_1", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Minimax_2":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_2", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Minimax_3":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_3")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="minimax_3", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Local Search":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="local_search")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="local_search", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )
                             elif button.text == "Genetic Algorithm":
-                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="genetic_algorithm")
+                                othello_gui = OthelloGUI(player_mode="ai", ai_mode="genetic_algorithm", eval_mode=self.tmp_fungsi_eval)
                                 othello_gui.run_game(
                                     return_to_menu_callback=self.draw_menu
                                 )

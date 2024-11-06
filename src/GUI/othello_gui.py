@@ -16,7 +16,7 @@ GREEN_COLOR = (0, 128, 0)
 
 
 class OthelloGUI:
-    def __init__(self, player_mode="friend", ai_mode=None):
+    def __init__(self, player_mode="friend", ai_mode=None, eval_mode="1"):
         """
         A graphical user interface (GUI) for playing the Othello game.
 
@@ -24,7 +24,7 @@ class OthelloGUI:
             player_mode (str): The mode of the game, either "friend" or "ai" (default is "friend").
         """
         self.win = self.initialize_pygame()
-        self.game = OthelloGame(player_mode=player_mode, ai_mode=ai_mode)
+        self.game = OthelloGame(player_mode=player_mode, ai_mode=ai_mode, eval_mode=eval_mode)
         self.message_font = pygame.font.SysFont(None, 24)
         self.message = ""
         self.invalid_move_message = ""

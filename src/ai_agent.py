@@ -82,6 +82,7 @@ def alphabeta(
             new_game = OthelloGame(player_mode=game.player_mode)
             new_game.board = [row[:] for row in game.board]
             new_game.current_player = game.current_player
+            new_game.eval_mode = game.eval_mode
             new_game.make_move(*move)
 
             eval, _ = alphabeta(new_game, max_depth - 1, False, alpha, beta)
@@ -103,6 +104,7 @@ def alphabeta(
             new_game = OthelloGame(player_mode=game.player_mode)
             new_game.board = [row[:] for row in game.board]
             new_game.current_player = game.current_player
+            new_game.eval_mode = game.eval_mode
             new_game.make_move(*move)
 
             eval, _ = alphabeta(new_game, max_depth - 1, True, alpha, beta)
@@ -118,8 +120,8 @@ def alphabeta(
         return min_eval, best_move
 
 
-def evaluate_game_state(game, type=1):
-    if type == 1:
+def evaluate_game_state(game):
+    if game.eval_mode == "1":
         return evaluate_game_state_v1(game)
     else:
         return evaluate_game_state_v2(game)
@@ -314,6 +316,7 @@ def local_search(game):
         old_game.board = [row[:] for row in game.board]
         old_game.current_player = game.current_player
         old_game.ai_mode = game.ai_mode
+        old_game.eval_mode = game.eval_mode
 
         T = 100
         best_current_value = -9999
@@ -327,6 +330,7 @@ def local_search(game):
             new_game.board = [row[:] for row in old_game.board]
             new_game.current_player = old_game.current_player
             new_game.ai_mode = old_game.ai_mode
+            new_game.eval_mode = old_game.eval_mode
             new_game.make_move(*old_valid_moves[index])
 
             new_value = None
@@ -348,6 +352,7 @@ def local_search(game):
                 old_game.board = [row[:] for row in new_game.board]
                 old_game.current_player = new_game.current_player
                 old_game.ai_mode = new_game.ai_mode
+                old_game.eval_mode = new_game.eval_mode
             else:
                 if T == 0:
                     break
@@ -356,6 +361,7 @@ def local_search(game):
                     old_game.board = [row[:] for row in new_game.board]
                     old_game.current_player = new_game.current_player
                     old_game.ai_mode = new_game.ai_mode
+                    old_game.eval_mode = new_game.eval_mode
             
             T *= 0.98
 
@@ -383,6 +389,7 @@ def genetic(game):
         new_game.board = [row[:] for row in game.board]
         new_game.current_player = game.current_player
         new_game.ai_mode = game.ai_mode
+        new_game.eval_mode = game.eval_mode
         new_game.make_move(*valid_moves[i])
 
         new_value = evaluate_game_state(new_game)
@@ -395,6 +402,7 @@ def genetic(game):
                 new_child_game.board = [row[:] for row in new_game.board]
                 new_child_game.current_player = new_game.current_player
                 new_child_game.ai_mode = new_game.ai_mode
+                new_child_game.eval_mode = new_game.eval_mode
                 new_child_game.make_move(*new_valid_moves[j])
 
                 new_child_game.current_player = -1*new_child_game.current_player
@@ -409,6 +417,7 @@ def genetic(game):
                 new_child_game.board = [row[:] for row in new_game.board]
                 new_child_game.current_player = new_game.current_player
                 new_child_game.ai_mode = new_game.ai_mode
+                new_child_game.eval_mode = new_game.eval_mode
                 new_child_game.make_move(*new_valid_moves[0])
                 new_child_game.current_player = -1*new_child_game.current_player
                 values.append((new_value + evaluate_game_state(new_child_game))/2)
